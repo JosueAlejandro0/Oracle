@@ -1,128 +1,81 @@
-var http = require('http');
-var oracledb = require('oracledb');
-var express = require('express');
-var app = express();
+const servidor = require('./servicio/servidor');
+const dbConfig = require('./config/database.js');
+const database = require('./services/database.js');
+const defaultThreadPoolSize = 4;
+process.env.UV_THREADPOOL_SIZE = dbConfig.hrPool.poolMax + defaultThreadPoolSize;
 
-app.get('/', function (req, res) {
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  res.write("No Data Requested, so none is returned");
-  res.end();
-  });
+async function WebServer(){
+  console.log('Inicio de la aplicacion');
 
-  app.get('/api', function(req,res){ handleResources(req, res);} );
+  try {
+    console.log('Iniciando modulo de database');
  
-  app.get('/api/:id', function(req,res){
-    var idEmpleado = req.params.id;
-
-    handleDatabaseOperation( req, res, function (request, response, connection) {
-      var selectStatement = "SELECT * from sat_ags_cayas_act_mv where ID_EMPLEADO = :id";
-      connection.execute( selectStatement
-      , [idEmpleado], {
-      outFormat: oracledb.OBJECT // Return the result as Object
-      }, function (err, result) {
-      if (err) {
-      console.log('Error de ejecución en query'+err.message);
-      response.writeHead(500, {'Content-Type': 'application/json'});
-      response.end(JSON.stringify({
-      status: 500,
-      message: "Error al obtener a los empleados "+departmentIdentifier,
-      detailed_message: err.message
-      })
-      );
-      } else {
-      console.log('Esta lista la respuesta de db '+result.rows);
-      response.writeHead(200, {'Content-Type': 'application/json'});
-      response.end(JSON.stringify(result.rows));
-      }
-      doRelease(connection);
-      }
-      );
-      });
-      } );
-      
-
-
-      function handleDatabaseOperation( request, response, callback) {
-        console.log(request.method + ":" + request.url );
-        response.setHeader('Access-Control-Allow-Origin', '*');
-        response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-        response.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-        response.setHeader('Access-Control-Allow-Credentials', true);
-         
-        console.log('Handle request: '+request.url);
-        var connectString = process.env.NODE_ORACLEDB_CONNECTIONSTRING || "AGSVISTA";
-        console.log('ConnectString :' + connectString);
-        oracledb.getConnection(
-        {
-        user : process.env.NODE_ORACLEDB_USER || "Josue",
-        password : process.env.NODE_ORACLEDB_PASSWORD || "JOSUE",
-        connectString : connectString
-        },
-        function(err, connection)
-        {
-        if (err) {
-        console.log('Error en conexión ...');
-        console.log('Mensaje de Error '+err.message);
-         
-
-// Error connecting to DB
-response.writeHead(500, {'Content-Type': 'application/json'});
-response.end(JSON.stringify({
-status: 500,
-message: "Error connecting to DB",
-detailed_message: err.message
+    await database.initialize(); 
+  } catch (err) {
+    console.error(err);
+ 
+    process.exit(1); // Non-zero failure code
+  }
+  try{
+    console.log('Inicio del servidor');
+    await servidor.TestServer();
+  }catch(err){
+    console.log('Mensaje de error '+err);
+    ProcessingInstruction.exit(1);
+  }
 }
-));
-return;
+
+WebServer();
+
+async function shutdown(e) {
+  let err = e;
+    
+  console.log('Apagando');
+
+  try {
+    console.log('Closing database module');
+ 
+    await database.close(); 
+  } catch (err) {
+    console.log('Encountered error', e);
+ 
+    err = err || e;
+  }
+ 
+  try {
+    console.log('Cerrando servidor web');
+ 
+    await webServer.close();
+  } catch (e) {
+    console.log('Mensaje de Error ', e);
+ 
+    err = err || e;
+  }
+ 
+  console.log('Saliendo de proceso');
+ 
+  if (err) {
+    process.exit(1); // Non-zero failure code
+  } else {
+    process.exit(0);
+  }
 }
-// do with the connection whatever was supposed to be done
-callback(request, response, connection);
+ 
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM');
+ 
+  shutdown();
 });
-}
  
-function handleResources(request, response) {
-handleDatabaseOperation( request, response, function (request, response, connection) {
-var nameEmpleado = request.query.name ||'%';
+process.on('SIGINT', () => {
+  console.log('Received SIGINT');
  
-var selectStatement = "SELECT * FROM sat_ags_cayas_act_mv where NOMBRES like :nameEmpleado";
-connection.execute( selectStatement
-, [nameEmpleado], {
-outFormat: oracledb.OBJECT // Return the result as Object
-}, function (err, result) {
-if (err) {
-console.log('Error de ejecución'+err.message);
-response.writeHead(500, {'Content-Type': 'application/json'});
-response.end(JSON.stringify({
-status: 500,
-message: "Error en query",
-detailed_message: err.message
-})
-);
-} else {
-console.log('db response is ready '+result.rows);
-response.writeHead(200, {'Content-Type': 'application/json'});
-response.end(JSON.stringify(result.rows));
-}
-doRelease(connection);
-}
-);
- 
+  shutdown();
 });
-} //handleAllDepartments
  
-function doRelease(connection)
-{
-connection.release(
-function(err) {
-if (err) {
-console.error(err.message);
-}
+process.on('uncaughtException', err => {
+  console.log('Uncaught exception');
+  console.error(err);
+ 
+  shutdown(err);
 });
-}
-
-
-
-
-
-const PORT = process.env.PORT || 5000;
-app.listen(5000);
