@@ -1,4 +1,4 @@
-const database = require('../services/database.js');
+const database = require('../servicio/database.js');
  
 const baseQuery = 
  `select ID_PERSONA "id_persona",
@@ -29,7 +29,7 @@ const baseQuery =
     ADMINISTRACION_GENERAL "administracion_general",
     UNIDAD_ADMINISTRATIVA "unidad_administrativa",
     DEPENDENCIA_DIRECTA "dependencia_directa",
-    REF_CORTO_JEFE "ref_corto_jefe",
+    RFC_CORTO_JEFE "ref_corto_jefe",
     DT_REGISTRO "dt_registro"
   from sat_ags_cayas_act_mv`;
  
@@ -38,9 +38,10 @@ async function find(context) {
   const binds = {};
  
   if (context.id) {
-    binds.employee_id = context.id;
+    binds.id = context.id;
  
-    query += `\nwhere id_empleado = :id`;
+    query += `\nwhere id_persona = :id `;
+
   }
  
   const result = await database.simpleExecute(query, binds);

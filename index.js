@@ -1,8 +1,8 @@
 const servidor = require('./servicio/servidor');
 const dbConfig = require('./config/database.js');
-const database = require('./services/database.js');
+const database = require('./servicio/database.js');
 const defaultThreadPoolSize = 4;
-process.env.UV_THREADPOOL_SIZE = dbConfig.hrPool.poolMax + defaultThreadPoolSize;
+process.env.UV_THREADPOOL_SIZE = dbConfig.Connection.poolMax + defaultThreadPoolSize;
 
 async function WebServer(){
   console.log('Inicio de la aplicacion');
@@ -19,6 +19,7 @@ async function WebServer(){
   try{
     console.log('Inicio del servidor');
     await servidor.TestServer();
+    
   }catch(err){
     console.log('Mensaje de error '+err);
     ProcessingInstruction.exit(1);

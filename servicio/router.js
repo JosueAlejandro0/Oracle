@@ -4,7 +4,12 @@ const empleados = require('../controllers/empleados.js');
  
 router.route('/empleados/:id?')
   .get(empleados.get)
-  .post(empleados.post)
+/* .post(empleados.post)
   .put(empleados.put)
-  .delete(empleados.delete);
+  .delete(empleados.delete)*/;
+
+  
+router.route('/uri/:uri')
+.post(uri.post);
 module.exports = router;
+

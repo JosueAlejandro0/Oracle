@@ -1,4 +1,4 @@
-const empleados = require('../db_apis/empleados.js');
+const empleados = require('../db_api/empleados.js');
  
 async function get(req, res, next) {
   try {
