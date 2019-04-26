@@ -22,6 +22,9 @@ async function close() {
    
       try {
         conn = await oracledb.getConnection();
+   console.log(statement);
+   console.log(binds);
+   console.log(opts);
    
         const result = await conn.execute(statement, binds, opts);
    
