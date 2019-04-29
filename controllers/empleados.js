@@ -3,7 +3,6 @@ const empleados = require('../db_api/empleados.js');
 async function get(req, res, next) {
   try {
     const context = {};
- 
     context.id = parseInt(req.params.id, 10);
  
     const rows = await empleados.find(context);
