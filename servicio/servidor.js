@@ -9,22 +9,17 @@ function TestServer() {
   return new Promise((resolve, reject) => {
     const app = express();
     httpServer = http.createServer(app);
-
     // Combines logging info from request and response
     app.use(morgan('combined'));
-
     // Parse incoming JSON requests and revive JSON.
     app.use(express.json({
       reviver: reviveJson
     }));
-
     // Mount the router at /api so all its routes start with /api
     app.use('/api', router);
-
     httpServer.listen(webServerConfig.PORT)
       .on('listening', () => {
         console.log(`Web server listening on localhost:${webServerConfig.PORT}`);
-
         resolve();
       })
       .on('error', err => {
@@ -36,19 +31,18 @@ function TestServer() {
 module.exports.TestServer = TestServer;
 
 function close() {
-    return new Promise((resolve, reject) => {
-      httpServer.close((err) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-   
-        resolve();
-      });
+  return new Promise((resolve, reject) => {
+    httpServer.close((err) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve();
     });
-  }
+  });
+}
    
-  module.exports.close = close;
+module.exports.close = close;
 
 const iso8601RegExp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/;
  

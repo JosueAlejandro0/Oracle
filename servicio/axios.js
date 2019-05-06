@@ -1,7 +1,6 @@
 const axios = require('axios');
 const empleado = require('../controllers/empleados.js');
 async function get(req, res, next) {
-
     try {
         if(req.params.id == null || req.params.id === 'save'){
             var http = `http://cayas-ags-cayas.openshift.cpnlab/ws-cayas/rest/${req.params.uri}`;      
@@ -11,13 +10,10 @@ async function get(req, res, next) {
           await axios.get(http,{         
         })
             .then(response => {
-              if(req.params.string === 'save' || req.params.id === 'save'){
-                   
-                
+              if(req.params.string === 'save' || req.params.id === 'save'){     
                     for(var i = 0 ; i <=Object.keys(response.data).length-1;i++){ 
                       empleado.post(response.data[i]).then(empleado.update());
-                    }
-                    
+                    } 
               }
               res.send(response.data);
            
@@ -38,13 +34,10 @@ async function get(req, res, next) {
               console.log('Error', error.message);
             }
             console.log(error.config);
-          });
-   
-        
-              
+          });         
     } catch (err) {
       next(err);
     }
   }
    
-  module.exports.get = get;
+module.exports.get = get;

@@ -2,11 +2,9 @@ const empleados = require('../db_api/empleados.js');
 //-------------------------------------- 
 async function get(req, res, next) {
   try {
-    const context = {};
-    context.id = parseInt(req.params.id, 10);
- 
-    const rows = await empleados.find(context);
- 
+    //const context = {};
+    //context.id = parseInt(req.params.id, 10);
+    const rows = await empleados.find(req.params);
     if (req.params.id) {
       if (rows.length === 1) {
         res.status(200).json(rows[0]);
@@ -24,7 +22,6 @@ module.exports.get = get;
 //--------------------------------------
 function ObtenerEmpleado(req) {
   const empleado = {
-
     ID_PERSONA: req.idPersona,
     ID_EMPLEADO: req.idEmpleado,
     RFC_CORTO: req.rfcCorto,
