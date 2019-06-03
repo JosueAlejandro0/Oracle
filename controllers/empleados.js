@@ -50,7 +50,8 @@ function ObtenerEmpleado(req) {
     ADMINISTRACION_GENERAL: req.administracionGeneral,
     UNIDAD_ADMINISTRATIVA: req.unidadAdministrativa,
     DEPENDENCIA_DIRECTA: req.dependenciaDirecta ,
-    RFC_CORTO_JEFE: req.rfcCortoJefe  
+    RFC_CORTO_JEFE: req.rfcCortoJefe,
+    FECHA_ING_GOB_FED:req.fechaIngGobFed  
   };
   return empleado;
 }
@@ -75,3 +76,4 @@ async function update(req, res, next) {
   }
 }
 module.exports.update = update;
+

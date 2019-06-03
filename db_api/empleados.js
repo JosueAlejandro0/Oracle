@@ -14,24 +14,25 @@ const baseQuery =
     TIENE_HIJOS,
     RFC,
     CURP,
-    NO_ISSSTE ,
+    NO_ISSSTE,
     TIPO_SANGRE,
-    CODIGO_DEPARTAMENTO ,
+    CODIGO_DEPARTAMENTO,
     INMUEBLE,
-    NIVEL_JERARQUICO ,
-    TIPO_PUESTO ,
-    CLASIFICACION_PUESTO ,
+    NIVEL_JERARQUICO,
+    TIPO_PUESTO,
+    CLASIFICACION_PUESTO,
     CODIGO_PUESTO,
-    ESTATUS ,
-    FECHA_ALTA ,
-    CORREO_ELECTRONICO ,
-    FECHA_BAJA ,
-    MOTIVO_BAJA ,
-    ADMINISTRACION_GENERAL ,
-    UNIDAD_ADMINISTRATIVA ,
-    DEPENDENCIA_DIRECTA ,
-    RFC_CORTO_JEFE 
-  from sat_ags_cayas_act_mv`;
+    ESTATUS,
+    FECHA_ALTA,
+    CORREO_ELECTRONICO,
+    FECHA_BAJA,
+    MOTIVO_BAJA,
+    ADMINISTRACION_GENERAL,
+    UNIDAD_ADMINISTRATIVA,
+    DEPENDENCIA_DIRECTA,
+    RFC_CORTO_JEFE,
+    FECHA_ING_GOB_FED 
+    from sat_ags_cayas_act_mv`;
  
 async function find(context) {
   
@@ -95,7 +96,8 @@ const createSql =
  :ADMINISTRACION_GENERAL,
  :UNIDAD_ADMINISTRATIVA,
  :DEPENDENCIA_DIRECTA,
- :RFC_CORTO_JEFE); END;`;
+ :RFC_CORTO_JEFE,
+ :FECHA_ING_GOB_FED); END;`;
 async function create(emp) {
   const empleado = Object.assign({}, emp); 
   await database.simpleExecute(createSql, empleado);
@@ -110,10 +112,11 @@ const UpdateSql =
     ACT_INS_SAT_AGS_CAYAS_MV();
     --rollback; 
   END;`;
-async function Update(context) {
+async function Update() {
   let Upquery = UpdateSql;
   const binds = {};
   const result = await database.simpleExecute(Upquery, binds);
   return result;
 }
 module.exports.Update = Update;
+
